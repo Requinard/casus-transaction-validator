@@ -1,0 +1,7 @@
+- In welk formaat moet de output aangeboden worden?
+- Kunnen er meerdere bestanden in een rapportage?
+- Moet de data interim nog opgeslagen worden in een DB of is deze applicatie puur om een report te genereren
+- Moet er nog extra validatie over transacties, specifiek
+  - Geen negatieve endsaldo's
+  - "," of "." voor decimalen
+
