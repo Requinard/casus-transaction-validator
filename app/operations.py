@@ -1,12 +1,12 @@
-import csv
-from typing import Dict, Iterable
+from typing import Dict, Iterable, TextIO
 
+import pandas as pd
 from fastapi import UploadFile
 
 from models import TransactionCollection
 
 
-def load_file(file: UploadFile) -> Dict:
+def load_file(file: UploadFile) -> Iterable:
     """
     Loads a file into a regular dict
     """
@@ -14,12 +14,13 @@ def load_file(file: UploadFile) -> Dict:
         return load_csv(file.file)
 
 
-def load_csv(csv_file) -> Iterable:
+def load_csv(csv_content) -> Iterable:
     """
     Loads CSV into a generic dict
     """
-    with open(csv_file, 'r') as f:
-        return csv.DictReader(f)
+    df = pd.read_csv(csv_content)
+
+    return df.to_dict(orient="records")
 
 
 def load_xml(xml_file) -> Iterable:

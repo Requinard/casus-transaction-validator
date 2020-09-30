@@ -2,7 +2,7 @@ from fastapi import FastAPI, UploadFile, File
 from starlette.responses import RedirectResponse
 
 from models import TransactionCollection
-from operations import load_file
+from operations import load_file, parse_to_models
 
 app = FastAPI(
     title="ACME Transaction Validator"
@@ -28,6 +28,6 @@ def validate_transactions(
 
     file_rows = load_file(file)
 
+    result = parse_to_models(file_rows)
 
-
-    return TransactionCollection(transactions=[])
+    return result

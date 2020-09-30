@@ -46,9 +46,6 @@ class Mutation(str):
 
     @classmethod
     def validate(cls, v):
-        if not isinstance(v, str):
-            raise TypeError('string required')
-
         if v[0] not in ["+", "-"]:
             raise TypeError("First character of a mutation must be + or -")
 
