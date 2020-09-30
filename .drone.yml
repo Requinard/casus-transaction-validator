@@ -1,0 +1,51 @@
+kind: pipeline
+type: docker
+name: Backend
+
+aws: &aws-secrets
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_key
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret
+
+steps:
+  - name: prepare package
+    image: python:3.8
+    commands:
+      - cd app
+      - pip install poetry
+      - poetry export -f requirements.txt > requirements.txt
+      - pip install -r requirements.txt -t .
+      - chmod -R 755 .
+
+  - name: zip app
+    image: requinard2/base
+    commands:
+      - cd app
+      - zip -r ../app.zip .
+
+  - name: terraform init
+    image: requinard2/terraform
+    <<: *aws-secrets
+    commands:
+      - cd terraform
+      - terraform init
+
+  - name: switch workspace
+    image: requinard2/terraform
+    <<: *aws-secrets
+    commands:
+      - cd terraform
+      - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
+    when:
+      branch:
+        exclude:
+          - master
+
+  - name: terraform apply
+    image: requinard2/terraform
+    <<: *aws-secrets
+    commands:
+      - cd terraform
+      - terraform apply -auto-approve
