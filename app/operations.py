@@ -33,6 +33,10 @@ def parse_to_models(raw_items: Iterable[Dict]) -> TransactionCollection:
     """
     Takes a list of raw transactions and parses them to a TransactionCollection
     """
-    return TransactionCollection.construct(
-        transactions=raw_items
+    collection = TransactionCollection(
+        raw_transactions=raw_items
     )
+
+    collection.process()
+
+    return collection

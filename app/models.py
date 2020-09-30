@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import List, Union
+from typing import List, Any, Tuple, Union
 
-from pydantic import BaseModel, Field, StrictInt, validator, ValidationError, root_validator
+from pydantic import BaseModel, Field, StrictInt, validator, ValidationError
 from schwifty import IBAN
 
 
@@ -77,35 +77,32 @@ class TransactionRecord(BaseModel):
             raise ValidationError(e)
 
 
-class FailedTransaction(BaseModel):
-    transaction: TransactionRecord
-    failures: List[Union[ValidationError, ValueError]]
-
-    class Config:
-        # Enable arbitrary types to show specific errors for the failures
-        arbitrary_types_allowed = True
-
-
 class TransactionCollection(BaseModel):
     """
     Validate a group of transactions
     """
-    transactions: List[TransactionRecord]
-    failed_transactions: List[FailedTransaction] = []
+    raw_transactions: List[Any]
+    invalid_transactions: List[Tuple[Any, List[Union[ValidationError, ValueError, TypeError]]]] = []
+    valid_transactions: List[TransactionRecord] = []
 
-    @root_validator
-    def validate_unique_references(cls, values):
-        references = set()
+    def process(self):
+        """
+        Process all raw transactions and sort them into valid or invalid categories
+        """
+        existing_references = set()
 
-        for item in values["transactions"]:
-            if item.reference in references:
-                failed_transaction = FailedTransaction(
-                    transaction=item,
-                    failures=[
-                        ValueError("This unique reference was already listed!")
-                    ]
-                )
-                values['failed_transactions'].append(failed_transaction)
-            else:
-                references.add(item.reference)
-        return values
+        for item in self.raw_transactions:
+            try:
+                transaction = TransactionRecord.validate(item)
+
+                if transaction.reference in existing_references:
+                    raise ValueError(f"Transaction {transaction.reference} already exists!")
+
+                existing_references.add(transaction.reference)
+                self.valid_transactions.append(transaction)
+            except Exception as e:
+                self.invalid_transactions.append((item, e))
+
+    class Config:
+        # Enable arbitrary types to show specific errors for the failures
+        arbitrary_types_allowed = True

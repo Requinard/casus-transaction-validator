@@ -100,11 +100,14 @@ class TransactionCollectionTest(TestCase):
             })
 
         collection = TransactionCollection(
-            transactions=transactions
+            raw_transactions=transactions
         )
 
-        self.assertEqual(len(collection.transactions), 100)
-        self.assertEqual(len(collection.failed_transactions), 0)
+        collection.process()
+
+        self.assertEqual(len(collection.raw_transactions), 100)
+        self.assertEqual(len(collection.valid_transactions), 100)
+        self.assertEqual(len(collection.invalid_transactions), 0)
 
     def test_failures_on_reused_references(self):
         transactions = []
@@ -120,8 +123,11 @@ class TransactionCollectionTest(TestCase):
             })
 
         collection = TransactionCollection(
-            transactions=transactions
+            raw_transactions=transactions
         )
 
-        self.assertEqual(len(collection.transactions), 100)
-        self.assertEqual(len(collection.failed_transactions), 99)
+        collection.process()
+
+        self.assertEqual(len(collection.raw_transactions), 100)
+        self.assertEqual(len(collection.valid_transactions), 1)
+        self.assertEqual(len(collection.invalid_transactions), 99)
