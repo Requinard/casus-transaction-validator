@@ -12,6 +12,7 @@ uvicorn = "^0.12.0"
 schwifty = "^2020.9.0"
 python-multipart = "^0.0.5"
 pandas = "^1.1.2"
+xmltodict = "^0.12.0"
 
 [tool.poetry.dev-dependencies]
 

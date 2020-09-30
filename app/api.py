@@ -28,6 +28,6 @@ def validate_transactions(
 
     file_rows = load_file(file)
 
-    result = parse_to_models(file_rows)
+    result = parse_to_models(file_rows, file.content_type)
 
     return result

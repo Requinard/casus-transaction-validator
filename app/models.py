@@ -1,7 +1,7 @@
 from decimal import Decimal
-from typing import List, Any, Tuple, Union
+from typing import List, Any, Tuple, Union, Callable
 
-from pydantic import BaseModel, Field, StrictInt, validator, ValidationError
+from pydantic import BaseModel, Field, validator, ValidationError, PositiveInt
 from schwifty import IBAN
 
 
@@ -25,9 +25,9 @@ class Mutation(str):
         return self._get_sign() * self._get_number()
 
     # todo validate mutation
-    def validate_transaction(self, start_balance: Decimal, end_balance: Decimal):
+    def validate_transaction(self, start_balance: Decimal, end_balance: Decimal, reference: PositiveInt):
         if start_balance + self._get_mutation_amount() != end_balance:
-            raise ValueError("This transaction does not add up!")
+            raise ValueError(f"Transaction {reference} does not add up")
 
     @classmethod
     def __get_validators__(cls):
@@ -54,17 +54,31 @@ class Mutation(str):
         except:
             raise TypeError("All other characters must be parsable to a decimal")
 
+    class Config:
+        allow_population_by_field_name = True
+
 
 class TransactionRecord(BaseModel):
     """
     Validate a single transaction
     """
-    reference: StrictInt = Field(..., alias="Reference")
-    account_number: str = Field(..., alias="Account Number")
-    description: str = Field(..., alias="Description")
-    start_balance: Decimal = Field(..., alias="Start Balance")
-    mutation: Mutation = Field(..., alias="Mutation")  # todo test if this works out
-    end_balance: Decimal = Field(..., alias="End Balance")
+    reference: PositiveInt = Field(...)
+    account_number: str = Field(...)
+    description: str = Field(...)
+    start_balance: Decimal = Field(...)
+    mutation: str = Field(...)
+    end_balance: Decimal = Field(...)
+
+    def check_amount_validity(self):
+        m = Mutation(self.mutation)
+
+        m.validate_transaction(self.start_balance, self.end_balance, self.reference)
+
+    @validator('mutation')
+    def validate_mutation_format(cls, v):
+        Mutation(v)
+
+        return v
 
     @validator("account_number")
     def validate_account_number(cls, v):
@@ -73,24 +87,65 @@ class TransactionRecord(BaseModel):
         except ValueError as e:
             raise ValidationError(e)
 
+        return v
+
+
+class CSVTransactionRecord(TransactionRecord):
+    class Config:
+        fields = {
+            'reference': 'Reference',
+            'account_number': 'Account Number',
+            'description': 'Description',
+            'start_balance': 'Start Balance',
+            'mutation': 'Mutation',
+            'end_balance': 'End Balance'
+        }
+
+
+class XMLTransactionRecord(TransactionRecord):
+    class Config:
+        fields = {
+            'reference': 'reference',
+            'account_number': 'accountNumber',
+            'description': 'description',
+            'start_balance': 'startBalance',
+            'mutation': 'mutation',
+            'end_balance': 'endBalance'
+        }
+
+
+ErrorType = Union[ValidationError, Any]
+FailedTransaction = Tuple[Any, str]
+
 
 class TransactionCollection(BaseModel):
     """
     Validate a group of transactions
     """
+    content_type: str
     raw_transactions: List[Any]
-    invalid_transactions: List[Tuple[Any, List[Union[ValidationError, ValueError, TypeError]]]] = []
+    invalid_transactions: List[FailedTransaction] = []
     valid_transactions: List[TransactionRecord] = []
+
+    def get_validator(self):
+        if self.content_type == 'text/csv':
+            return CSVTransactionRecord.validate
+        elif self.content_type == 'text/xml':
+            return XMLTransactionRecord.validate
+        else:
+            return TransactionRecord.validate
 
     def process(self):
         """
         Process all raw transactions and sort them into valid or invalid categories
         """
         existing_references = set()
+        validator: Callable = self.get_validator()
 
         for item in self.raw_transactions:
             try:
-                transaction = TransactionRecord.validate(item)
+                transaction: TransactionRecord = validator(item)
+                transaction.check_amount_validity()
 
                 if transaction.reference in existing_references:
                     raise ValueError(f"Transaction {transaction.reference} already exists!")
@@ -98,7 +153,8 @@ class TransactionCollection(BaseModel):
                 existing_references.add(transaction.reference)
                 self.valid_transactions.append(transaction)
             except Exception as e:
-                self.invalid_transactions.append((item, e))
+                self.invalid_transactions.append(
+                    tuple([item, str(e)]))  # todo: this does not show up as it should. Error is empty
 
     class Config:
         # Enable arbitrary types to show specific errors for the failures

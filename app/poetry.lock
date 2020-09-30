@@ -165,8 +165,16 @@ h11 = ">=0.8,<0.11"
 [package.extras]
 standard = ["websockets (>=8.0.0,<9.0.0)", "watchgod (>=0.6,<0.7)", "python-dotenv (>=0.13.0,<0.14.0)", "PyYAML (>=5.1)", "httptools (>=0.1.0,<0.2.0)", "uvloop (>=0.14.0)", "colorama (>=0.4)"]
 
+[[package]]
+category = "main"
+description = "Makes working with XML feel like you are working with JSON"
+name = "xmltodict"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "0.12.0"
+
 [metadata]
-content-hash = "712358ad217bd0de188b86ebe1001a2473626e302f1d3726a3d25cfe407f2ed1"
+content-hash = "46769ffbaf3cc9f61872d4ba2bd077697211b89db2ba60b45023330f7763fdc0"
 python-versions = "^3.8"
 
 [metadata.files]
@@ -280,4 +288,8 @@ starlette = [
 uvicorn = [
     {file = "uvicorn-0.12.0-py3-none-any.whl", hash = "sha256:9a8f3501d977dedf77a540a0ec3cfadf409fe48eafca2c100d45d843ac62bc7b"},
     {file = "uvicorn-0.12.0.tar.gz", hash = "sha256:fbe9d1b764bc1f4599e1f150a0974feea0fd6380bec889c0d907ebd0a2e896a7"},
+]
+xmltodict = [
+    {file = "xmltodict-0.12.0-py2.py3-none-any.whl", hash = "sha256:8bbcb45cc982f48b2ca8fe7e7827c5d792f217ecf1792626f808bf41c3b86051"},
+    {file = "xmltodict-0.12.0.tar.gz", hash = "sha256:50d8c638ed7ecb88d90561beedbf720c9b4e851a9fa6c47ebd64e99d166d8a21"},
 ]
