@@ -21,21 +21,13 @@ steps:
     depends_on:
       - clone
 
-  - name: run tests
-    image: python:3.8
-    commands:
-      - cd app
-      - python -m unittest
-    depends_on:
-      - prepare package
-
   - name: zip app
     image: requinard2/base
     commands:
       - cd app
       - zip -r ../app.zip -7 .
     depends_on:
-      - run tests
+      - prepare package
 
   - name: terraform init
     image: requinard2/terraform
