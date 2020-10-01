@@ -46,10 +46,6 @@ steps:
       - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
     depends_on:
       - terraform init
-    when:
-      branch:
-        exclude:
-          - master
 
   - name: terraform apply
     image: requinard2/terraform

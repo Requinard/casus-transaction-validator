@@ -5,6 +5,8 @@ resource "aws_lambda_function" "lambda" {
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.8"
   source_code_hash = filebase64sha256("../app.zip")
+
+  tags = local.tags
 }
 
 resource "aws_lambda_permission" "apigateway" {

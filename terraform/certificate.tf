@@ -5,6 +5,7 @@ module "certificate" {
   zone_name                         = var.dns_zone
   ttl                               = "300"
   wait_for_certificate_issued       = true
+  tags                              = local.tags
 
   providers = {
     aws: aws.us

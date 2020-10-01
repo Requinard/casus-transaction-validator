@@ -1,5 +1,6 @@
 resource "aws_api_gateway_rest_api" "app" {
-  name        = local.app_name
+  name = local.app_name
+  tags = local.tags
 }
 
 resource "aws_api_gateway_resource" "proxy" {
