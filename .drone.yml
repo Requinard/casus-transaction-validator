@@ -18,12 +18,24 @@ steps:
       - poetry export -f requirements.txt > requirements.txt
       - pip install -r requirements.txt -t .
       - chmod -R 755 .
+    depends_on:
+      - clone
+
+  - name: run tests
+    image: python:3.8
+    commands:
+      - cd app
+      - python -m unittest
+    depends_on:
+      - prepare package
 
   - name: zip app
     image: requinard2/base
     commands:
       - cd app
       - zip -r ../app.zip -7 .
+    depends_on:
+      - run tests
 
   - name: terraform init
     image: requinard2/terraform
@@ -31,6 +43,8 @@ steps:
     commands:
       - cd terraform
       - terraform init
+    depends_on:
+      - clone
 
   - name: switch workspace
     image: requinard2/terraform
@@ -38,6 +52,8 @@ steps:
     commands:
       - cd terraform
       - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
+    depends_on:
+      - terraform init
     when:
       branch:
         exclude:
@@ -49,3 +65,7 @@ steps:
     commands:
       - cd terraform
       - terraform apply -auto-approve
+    depends_on:
+      - zip app
+      - terraform init
+      - switch workspace
