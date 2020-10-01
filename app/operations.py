@@ -1,9 +1,8 @@
 from typing import Dict, Iterable
 
-import pandas as pd
 import xmltodict
+import csv
 from fastapi import UploadFile
-
 from models import TransactionCollection
 
 
@@ -21,9 +20,10 @@ def load_csv(csv_content) -> Iterable:
     """
     Loads CSV into a generic dict
     """
-    df = pd.read_csv(csv_content)
+    csv_fo = map(lambda x: x.decode(), csv_content.readlines())
+    df = csv.DictReader(csv_fo)
 
-    return df.to_dict(orient="records")
+    return list(df)
 
 
 def load_xml(xml_file) -> Iterable:
