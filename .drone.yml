@@ -23,7 +23,7 @@ steps:
     image: requinard2/base
     commands:
       - cd app
-      - zip -r ../app.zip -Z bzip2 -7 .
+      - zip -r ../app.zip -7 .
 
   - name: terraform init
     image: requinard2/terraform
