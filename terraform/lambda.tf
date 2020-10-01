@@ -1,7 +1,7 @@
 resource "aws_lambda_function" "lambda" {
   function_name    = "luminis-transaction-validator-${local.stage}"
   filename         = "../app.zip"
-  handler          = "api.handler"
+  handler          = "main.lambda_handler"
   role             = aws_iam_role.lambda.arn
   runtime          = "python3.8"
   source_code_hash = filebase64sha256("../app.zip")
