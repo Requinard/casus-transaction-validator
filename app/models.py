@@ -116,6 +116,7 @@ class XMLTransactionRecord(TransactionRecord):
 
 ErrorType = Union[ValidationError, Any]
 FailedTransaction = Tuple[Any, str]
+TransactionTypes = Union[TransactionRecord, XMLTransactionRecord, CSVTransactionRecord]
 
 
 class TransactionCollection(BaseModel):
@@ -125,7 +126,7 @@ class TransactionCollection(BaseModel):
     content_type: str
     raw_transactions: List[Any]
     invalid_transactions: List[FailedTransaction] = []
-    valid_transactions: List[TransactionRecord] = []
+    valid_transactions: List[TransactionTypes] = []
 
     def get_validator(self):
         if self.content_type == 'text/csv':

@@ -1,6 +1,7 @@
+from typing import List
+
 from fastapi import FastAPI, UploadFile, File
 from starlette.responses import RedirectResponse
-from typing import List, Any
 
 from models import TransactionCollection, TransactionRecord
 from operations import load_file, parse_to_models
@@ -29,6 +30,7 @@ def validate_transaction_collection(transactions: List[TransactionRecord]):
 
     return result
 
+
 @app.post("/transactions/validate/single")
 def validate_transaction_single(transaction: TransactionRecord):
     """
@@ -38,7 +40,8 @@ def validate_transaction_single(transaction: TransactionRecord):
 
     return result
 
-@app.post("/transactions/validate/upload")
+
+@app.post("/transactions/validate/upload", response_model=TransactionCollection)
 def validate_transactions_upload(
         file: UploadFile = File(...)
 ) -> TransactionCollection:
