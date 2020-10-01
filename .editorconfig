@@ -1,0 +1,8 @@
+root = True
+
+[*]
+indent_size = 4
+indent_style = space
+
+[*.tf]
+indent_size = 2

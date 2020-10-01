@@ -43,7 +43,7 @@ def validate_transaction_single(transaction: TransactionRecord):
 
 @app.post("/transactions/validate/upload", response_model=TransactionCollection)
 def validate_transactions_upload(
-        file: UploadFile = File(...)
+    file: UploadFile = File(...)
 ) -> TransactionCollection:
     """
     Validate a list of transactions from a file upload. Will validate reference uniqueness
