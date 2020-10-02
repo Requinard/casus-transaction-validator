@@ -1,14 +1,10 @@
 from typing import List
 
 from fastapi import UploadFile, File, APIRouter
-from .models import TransactionCollection, TransactionRecord
-from .operations import load_file, parse_to_models
 from starlette.responses import RedirectResponse
 
-accepted_content_types = [
-    "text/xml",
-    "text/csv"
-]
+from .models import TransactionCollection, TransactionRecord, AcceptedContentTypes
+from .operations import load_file, parse_to_models
 
 router = APIRouter()
 
@@ -18,7 +14,7 @@ def redirect_to_docs():
     return RedirectResponse("/docs")
 
 
-@router.post("/transactions/validate", response_model=TransactionCollection)
+@router.post("/transactions/validate", response_model=TransactionCollection, tags=["JSON"])
 def validate_transaction_collection(transactions: List[TransactionRecord]):
     """
     Validate a list of transactions in JSON format. Will automatically check if all reference ID's are unique
@@ -28,7 +24,7 @@ def validate_transaction_collection(transactions: List[TransactionRecord]):
     return result
 
 
-@router.post("/transactions/validate/single")
+@router.post("/transactions/validate/single", tags=["JSON"], response_model=TransactionCollection)
 def validate_transaction_single(transaction: TransactionRecord):
     """
     Validate a single transaction.
@@ -38,14 +34,14 @@ def validate_transaction_single(transaction: TransactionRecord):
     return result
 
 
-@router.post("/transactions/validate/upload", response_model=TransactionCollection)
+@router.post("/transactions/validate/upload", response_model=TransactionCollection, tags=["File"])
 def validate_transactions_upload(
     file: UploadFile = File(...)
 ) -> TransactionCollection:
     """
     Validate a list of transactions from a file upload. Will validate reference uniqueness
     """
-    if file.content_type not in accepted_content_types:
+    if file.content_type not in list(AcceptedContentTypes):
         raise ValueError("File is not in an accepted content-type")
 
     file_rows = load_file(file)

@@ -9,13 +9,13 @@ from .mutation import Mutation
 
 class TransactionRecord(BaseModel):
     """
-    Validate a single transaction
+    Model that holds all rules to validate a single transaction.
     """
     reference: PositiveInt = Field(...)
     account_number: str = Field(...)
     description: str = Field(...)
     start_balance: Decimal = Field(...)
-    mutation: str = Field(...)
+    mutation: Mutation = Field(...)
     end_balance: Decimal = Field(...)
 
     def check_amount_validity(self):
@@ -23,14 +23,11 @@ class TransactionRecord(BaseModel):
 
         m.validate_transaction(self.start_balance, self.end_balance, self.reference)
 
-    @validator('mutation')
-    def validate_mutation_format(cls, v):
-        Mutation(v)
-
-        return v
-
     @validator("account_number")
     def validate_account_number(cls, v):
+        """
+        Check if the account number is a valid IBAN
+        """
         try:
             IBAN(v)
         except ValueError as e:
@@ -40,6 +37,10 @@ class TransactionRecord(BaseModel):
 
 
 class CSVTransactionRecord(TransactionRecord):
+    """
+    A sub-class of TransactionRecord that allows us to read CSV-specific field names into our generic model.
+    """
+
     class Config:
         fields = {
             'reference': 'Reference',
@@ -52,6 +53,10 @@ class CSVTransactionRecord(TransactionRecord):
 
 
 class XMLTransactionRecord(TransactionRecord):
+    """
+    A sub-class of TransactionRecord that allows us to read XML-specific field names into our generic model
+    """
+
     class Config:
         fields = {
             'reference': 'reference',
@@ -63,5 +68,8 @@ class XMLTransactionRecord(TransactionRecord):
         }
 
 
+# Describe a failed transaction
 FailedTransaction = Tuple[Any, str]
+
+# Compound all possible transaction types into a single type
 TransactionTypes = Union[TransactionRecord, XMLTransactionRecord, CSVTransactionRecord]
