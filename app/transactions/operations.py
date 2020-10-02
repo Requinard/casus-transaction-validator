@@ -3,7 +3,7 @@ from typing import Dict, Iterable, List
 import xmltodict
 import csv
 from fastapi import UploadFile
-from models import TransactionCollection
+from .models import TransactionCollection
 
 
 def load_file(file: UploadFile) -> Iterable:
