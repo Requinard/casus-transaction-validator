@@ -4,6 +4,14 @@ import {Form, Field} from 'react-final-form'
 import './App.css';
 import {TransactionResults} from "./TransactionResults";
 
+const backendURL = () => {
+    if (window.location.href === "http://localhost:3000/") {
+        return "http://localhost:8000/"
+    } else {
+        return `https://api.${window.location.href.slice(8)}`
+    }
+}
+
 function App() {
     const [transactions, setTransactions] = useState([])
     const [invalidTransactions, setInvalidTransactions] = useState([])
@@ -27,7 +35,7 @@ function App() {
         formData.append('file', file, data['file'])
 
         try {
-            const response = await axios.post(`${url}/transactions/validate/upload`, formData, {
+            const response = await axios.post(`${url}transactions/validate/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -58,7 +66,7 @@ function App() {
                           <form onSubmit={handleSubmit}>
                               <h4>Upload your file here</h4>
                               <Field name='file' type='file' component='input' id='file'/> <br/>
-                              <Field name='backend' type='text' component='input' defaultValue="http://localhost:8000"/>
+                              <Field name='backend' type='text' component='input' defaultValue={backendURL()}/>
                               <br/>
                               <button type='submit'>Submit</button>
                           </form>

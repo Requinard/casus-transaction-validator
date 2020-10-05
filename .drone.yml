@@ -2,13 +2,6 @@ kind: pipeline
 type: docker
 name: Backend
 
-aws: &aws-secrets
-  environment:
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_key
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret
-
 steps:
   - name: prepare package
     image: python:3.8
@@ -29,9 +22,20 @@ steps:
     depends_on:
       - prepare package
 
+  - name: build frontend
+    image: requinard2/node
+    commands:
+      - cd frontend
+      - npm ci
+      - npm run build
+
   - name: terraform init
     image: requinard2/terraform
-    <<: *aws-secrets
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret
     commands:
       - cd terraform
       - terraform init
@@ -40,7 +44,11 @@ steps:
 
   - name: switch workspace
     image: requinard2/terraform
-    <<: *aws-secrets
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret
     commands:
       - cd terraform
       - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
@@ -49,7 +57,11 @@ steps:
 
   - name: terraform apply
     image: requinard2/terraform
-    <<: *aws-secrets
+    environment:
+      AWS_ACCESS_KEY_ID:
+        from_secret: aws_key
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: aws_secret
     commands:
       - cd terraform
       - terraform apply -auto-approve
@@ -57,3 +69,4 @@ steps:
       - zip app
       - terraform init
       - switch workspace
+      - build frontend

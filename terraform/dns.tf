@@ -1,5 +1,5 @@
 resource "aws_api_gateway_domain_name" "record" {
-  domain_name     = local.app_domain_full
+  domain_name     = local.api_domain
   certificate_arn = module.certificate.arn
 }
 
@@ -10,7 +10,7 @@ resource "aws_api_gateway_base_path_mapping" "record" {
 }
 
 resource "aws_route53_record" "record" {
-  name    = local.app_domain
+  name    = local.api_domain
   type    = "A"
   zone_id = data.aws_route53_zone.base_zone.id
 

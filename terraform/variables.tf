@@ -3,10 +3,12 @@ variable "dns_zone" {
 }
 
 locals {
-  stage           = terraform.workspace
-  is_production   = local.stage == "master"
+  stage         = terraform.workspace
+  is_production = local.stage == "master"
+
   app_domain      = local.is_production ? "luminis-validator" : "luminis-validator.${local.stage}"
   app_domain_full = "${local.app_domain}.${var.dns_zone}"
+  api_domain      = "api.${local.app_domain_full}"
 
   app_name = "luminis-validator-${local.stage}"
 
