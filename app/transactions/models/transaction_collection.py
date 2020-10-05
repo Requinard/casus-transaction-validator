@@ -53,21 +53,32 @@ class TransactionCollection(BaseModel):
         If any errors occur in this stage, add it to invalid transactions, along with the error message
         If no errors occur, we add the fully typed transaction to valid_transactions
         """
-        existing_references = set()
+        valid_ref_dict = dict()
         validator: Callable = self.get_validator()
 
         for item in self.raw_transactions:
             try:
+                # Validate the individual data fields
                 transaction: TransactionRecord = validator(item)
+
+                # Validate transaction amounts
                 transaction.check_amount_validity()
 
-                if transaction.reference in existing_references:
-                    raise ValueError(f"Transaction {transaction.reference} already exists!")
-
-                existing_references.add(transaction.reference)
-                self.valid_transactions.append(transaction)
+                # This is a bit ugly and stateful, This is basically a groupby.
+                existing_items = valid_ref_dict.get(transaction.reference, [])
+                existing_items.append(transaction)
+                valid_ref_dict[transaction.reference] = existing_items
             except Exception as e:
                 self.invalid_transactions.append((item, str(e)))
+
+        # The filter step after the latest groupby
+        for [key, value] in valid_ref_dict.items():
+            if len(value) > 1:
+                for transaction in value:
+                    self.invalid_transactions.append(
+                        (transaction, f'Transaction {transaction.reference} has a collision with other transactions!'))
+            elif len(value) == 1:
+                self.valid_transactions.append(value[0])
 
     class Config:
         # Enable arbitrary types to show specific errors for the failures

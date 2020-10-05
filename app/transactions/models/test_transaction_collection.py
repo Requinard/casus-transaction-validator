@@ -49,5 +49,5 @@ class TransactionCollectionTest(TestCase):
         collection.process()
 
         self.assertEqual(len(collection.raw_transactions), 100)
-        self.assertEqual(len(collection.valid_transactions), 1)
-        self.assertEqual(len(collection.invalid_transactions), 99)
+        self.assertEqual(len(collection.valid_transactions), 0)
+        self.assertEqual(len(collection.invalid_transactions), 100)
