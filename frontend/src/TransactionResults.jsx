@@ -18,7 +18,7 @@ export const TransactionResults = (props) => {
                 </thead>
                 <tbody>
                 {props.invalidTransactions.map((transaction, key) => (
-                    <tr>
+                    <tr key={key}>
                         <td>{transaction[0]['reference'] || transaction[0]['Reference']}</td>
                         <td>{transaction[1]}</td>
                     </tr>

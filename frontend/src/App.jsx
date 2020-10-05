@@ -8,21 +8,26 @@ function App() {
     const [transactions, setTransactions] = useState([])
     const [invalidTransactions, setInvalidTransactions] = useState([])
     const [error, setError] = useState("")
-    const [baseUrl, setUrl] = useState("http://localhost:8000") // #todo find the proper URL. Use it from the base url
-    const fileId = 'file'
 
     const sendToServer = async (data) => {
         // Reset
         setTransactions([])
         setInvalidTransactions([])
+        setError("")
 
         let formData = new FormData();
-        const file = document.getElementById(fileId).files[0];
+        const file = document.getElementById('file').files[0];
+
+        if (file === undefined) {
+            setError("Please select a file")
+            return
+        }
+        let url = data['backend']
 
         formData.append('file', file, data['file'])
 
         try {
-            const response = await axios.post(`${baseUrl}/transactions/validate/upload`, formData, {
+            const response = await axios.post(`${url}/transactions/validate/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -47,7 +52,9 @@ function App() {
                       render={({handleSubmit}) => (
                           <form onSubmit={handleSubmit}>
                               <h4>Upload your file here</h4>
-                              <Field name='file' type='file' id='file' component='input' id={fileId}/>
+                              <Field name='file' type='file' component='input' id='file'/> <br/>
+                              <Field name='backend' type='text' component='input' defaultValue="http://localhost:8000"/>
+                              <br/>
                               <button type='submit'>Submit</button>
                           </form>
                       )}
