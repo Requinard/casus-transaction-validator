@@ -1,17 +1,27 @@
 # Luminis Rotterdam Case
 
+Check `docs` for more info
+
 ## How to run/access
+
+### Frontend
+
+The frontend can currently only be run locally.
+
+- cd frontend
+- npm install
+- npm run start
 
 ### Local
 
-you will need a linux and python3.6+ installation for this
+you will need a linux and python3.8+ installation for this
 
 - cd app
 - pip install poetry
 - poetry install
 - python main.py
 
-You can now access this app at localhost:8000
+This should print the CLI help command. To run the webapp, use `python main.py run`
 
 ### Docker
 
@@ -35,14 +45,4 @@ do it like this
 - terraform apply
 
 The command concludes with the publically accessible URL
-
-## Architecture
-
-For the workings itself, I started with a functional-like onion architecture with BDD modelling. All layers can only communicate upwards
-
-- types -> Contains specific type definitions for this project
-- models -> Implements model constraints and models interaction
-- operations -> handle side effects from working on models such as reading files and parsing it to a common data structure
-- api -> handle validated API requests
-
 

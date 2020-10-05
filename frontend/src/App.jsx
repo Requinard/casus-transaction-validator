@@ -40,7 +40,12 @@ function App() {
             setInvalidTransactions(data['invalid_transactions'])
         } catch (e) {
             console.log(e)
-            setError(e)
+
+            if (e.response) {
+                setError(e.response.data['detail'])
+            } else {
+                setError(e)
+            }
         }
     }
 
@@ -60,7 +65,7 @@ function App() {
                       )}
                 />
 
-                {error ? <p>{error.toString()}</p> : <div/>}
+                {error ? <p style={{color: 'red'}}>{error.toString()}</p> : <div/>}
 
                 {transactions.length > 0 ?
                     <TransactionResults transactions={transactions} invalidTransactions={invalidTransactions}/> :

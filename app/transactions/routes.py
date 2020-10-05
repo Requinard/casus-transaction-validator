@@ -41,7 +41,9 @@ def validate_transactions_upload(
     file: UploadFile = File(...)
 ) -> TransactionCollection:
     """
-    Validate a list of transactions from a file upload. Will validate reference uniqueness
+    Validate a list of transactions from a file upload. Will validate reference uniqueness.
+
+    Upload size limit is 6MB.
     """
     try:
         content_type = AcceptedContentTypes(file.content_type)
