@@ -1,22 +1,22 @@
 import csv
+import json
 from typing import Dict, Iterable, IO
 
 import xmltodict
-from fastapi import UploadFile
 
 from .models import TransactionCollection, AcceptedContentTypes
 
 
-def load_file(file: UploadFile) -> Iterable:
+def load_file(content_type: AcceptedContentTypes, file: IO) -> Iterable:
     """
     Loads a file into a regular dict
     """
-    content_type = AcceptedContentTypes(file.content_type)
-
     if content_type == AcceptedContentTypes.CSV:
-        return load_csv(file.file)
+        return load_csv(file)
     elif content_type == AcceptedContentTypes.XML:
-        return load_xml(file.file)
+        return load_xml(file)
+    elif content_type == AcceptedContentTypes.JSON:
+        return json.load(file)
 
     raise ValueError(f"Cannot parse {content_type} as a file!")
 
@@ -46,7 +46,7 @@ def load_xml(xml_file: IO) -> Iterable:
     return rows
 
 
-def parse_to_models(raw_items: Iterable[Dict], type: str) -> TransactionCollection:
+def parse_to_models(raw_items: Iterable[Dict], type: AcceptedContentTypes) -> TransactionCollection:
     """
     Takes a list of raw transactions and parses them to a TransactionCollection
     """
