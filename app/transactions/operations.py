@@ -21,22 +21,27 @@ def load_file(content_type: AcceptedContentTypes, file: IO) -> Iterable:
     raise ValueError(f"Cannot parse {content_type} as a file!")
 
 
-def load_csv(csv_file: IO) -> Iterable:
+def load_csv(csv_file: IO, encoding: str = 'ISO-8859-1') -> Iterable:
     """
     Loads CSV into a generic dict
     """
-    csv_fo = map(lambda x: x.decode(), csv_file.readlines())
+    csv_fo = map(lambda x: x.decode(encoding), csv_file.readlines())
     dict_reader = csv.DictReader(csv_fo)
 
+    result = list(dict_reader)
+
+    if len(result) == 0:
+        raise ValueError(f"The decoded CSV file has no rows. Is the file encoded properly? It should be {encoding}")
+
     # Manually turn this into a list of dicts
-    return list(dict_reader)
+    return result
 
 
-def load_xml(xml_file: IO) -> Iterable:
+def load_xml(xml_file: IO, encoding: str = 'UTF-8') -> Iterable:
     """
     Loads XML into a generic dict
     """
-    parsed_data = xmltodict.parse(xml_file)
+    parsed_data = xmltodict.parse(xml_file, encoding=encoding)
     data_rows = parsed_data['records']['record']
     finished_rows = []
 

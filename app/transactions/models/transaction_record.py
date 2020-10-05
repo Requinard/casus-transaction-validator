@@ -11,9 +11,9 @@ class TransactionRecord(BaseModel):
     """
     Model that holds all rules to validate a single transaction.
     """
-    reference: PositiveInt = Field(...)
-    account_number: str = Field(...)
-    description: str = Field(...)
+    reference: PositiveInt = Field(..., description="A unique reference positive integer for this transaction")
+    account_number: str = Field(..., description="A valid IBAN account string")
+    description: str = Field(..., description="A description of the transaction")
     start_balance: Decimal = Field(...)
     mutation: Mutation = Field(...)
     end_balance: Decimal = Field(...)
