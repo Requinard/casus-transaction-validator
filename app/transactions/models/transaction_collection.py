@@ -78,7 +78,8 @@ class TransactionCollection(BaseModel):
                     self.invalid_transactions.append(
                         (transaction, f'Transaction {transaction.reference} has a collision with other transactions!'))
             elif len(value) == 1:
-                self.valid_transactions.append(value[0])
+                transaction: TransactionRecord = value[0]
+                self.valid_transactions.append(transaction)
 
     class Config:
         # Enable arbitrary types to show specific errors for the failures

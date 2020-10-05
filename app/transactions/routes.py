@@ -34,7 +34,9 @@ def validate_transaction_single(transaction: TransactionRecord):
     return result
 
 
-@router.post("/transactions/validate/upload", response_model=TransactionCollection, tags=["File"])
+@router.post("/transactions/validate/upload",
+             response_model=TransactionCollection,
+             tags=["File"])
 def validate_transactions_upload(
     file: UploadFile = File(...)
 ) -> TransactionCollection:
