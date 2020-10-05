@@ -4,7 +4,7 @@ from fastapi import UploadFile, File, APIRouter, HTTPException
 from starlette.responses import RedirectResponse
 
 from .models import TransactionCollection, TransactionRecord, AcceptedContentTypes
-from .operations import load_file, parse_to_models
+from .operations import load_file, parse_and_process
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ def validate_transaction_collection(transactions: List[TransactionRecord]):
     """
     Validate a list of transactions in JSON format. Will automatically check if all reference ID's are unique
     """
-    result = parse_to_models(transactions, AcceptedContentTypes.JSON)
+    result = parse_and_process(transactions, AcceptedContentTypes.JSON)
 
     return result
 
@@ -29,7 +29,7 @@ def validate_transaction_single(transaction: TransactionRecord):
     """
     Validate a single transaction.
     """
-    result = parse_to_models([transaction], AcceptedContentTypes.JSON)
+    result = parse_and_process([transaction], AcceptedContentTypes.JSON)
 
     return result
 
@@ -48,11 +48,11 @@ def validate_transactions_upload(
                             detail=f"Invalid content type {file.content_type}. Allowed content types are XML, CSV and JSON")
 
     try:
-        file_rows = load_file(file)
+        file_rows = load_file(content_type, file.file)
     except Exception:
         raise HTTPException(status_code=400,
                             detail="Cannot deconde contents of the file")
 
-    result = parse_to_models(file_rows, content_type)
+    result = parse_and_process(file_rows, content_type)
 
     return result

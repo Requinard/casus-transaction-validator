@@ -1,4 +1,6 @@
+import mimetypes
 from enum import Enum
+from os import PathLike
 from typing import List, Any, Callable
 
 from pydantic.main import BaseModel
@@ -11,6 +13,11 @@ class AcceptedContentTypes(str, Enum):
     CSV = "text/csv"
     XML = "text/xml"
     JSON = "application/json"
+
+    @staticmethod
+    def guess(f: PathLike):
+        mimetype = mimetypes.guess_type(f)
+        return AcceptedContentTypes(mimetype[0])
 
 
 class TransactionCollection(BaseModel):

@@ -2,8 +2,11 @@ import typer
 import uvicorn
 
 from api import app
+from transactions.commands import app as TransactionCommands
 
 cli = typer.Typer()
+
+cli.add_typer(TransactionCommands, name="transactions")
 
 
 @cli.command()

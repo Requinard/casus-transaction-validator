@@ -37,16 +37,19 @@ def load_xml(xml_file: IO) -> Iterable:
     Loads XML into a generic dict
     """
     parsed_data = xmltodict.parse(xml_file)
-    rows = parsed_data['records']['record']
+    data_rows = parsed_data['records']['record']
+    finished_rows = []
 
-    for item in rows:
+    for item in data_rows:
         # remove @-style reference as this does not work nicely with python dicts
         item['reference'] = item.pop('@reference')
 
-    return rows
+        finished_rows.append(dict(item))
+
+    return finished_rows
 
 
-def parse_to_models(raw_items: Iterable[Dict], type: AcceptedContentTypes) -> TransactionCollection:
+def parse_and_process(raw_items: Iterable[Dict], type: AcceptedContentTypes) -> TransactionCollection:
     """
     Takes a list of raw transactions and parses them to a TransactionCollection
     """
