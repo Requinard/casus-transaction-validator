@@ -1,18 +1,16 @@
-resource "aws_lambda_function" "lambda" {
-  function_name    = "luminis-transaction-validator-${local.stage}"
-  filename         = "../app.zip"
-  handler          = "lambda.handler"
-  role             = aws_iam_role.lambda.arn
-  runtime          = "python3.8"
-  source_code_hash = filebase64sha256("../app.zip")
+module "lambda_function" {
+  source = "git::https://gitea.mail.requinard.nl/requinard/terraform-modules.git//lambda-framework-apigateway?ref=master"
 
-  tags = local.tags
+  dns_certificate_arn = module.certificate.arn
+  dns_full_domain     = local.api_domain
+  dns_zone_id         = data.aws_route53_zone.base_zone.id
+
+  lambda_handler = "lambda.handler"
+  lambda_name    = "luminis-transaction-validator-${local.stage}"
+  lambda_runtime = "python3.8"
+  lambda_zip     = "../app.zip"
 }
 
-resource "aws_lambda_permission" "apigateway" {
-  action        = "lambda:InvokeFunction"
-  statement_id  = "ApiGatewayInvokeFunction"
-  function_name = aws_lambda_function.lambda.function_name
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_api_gateway_rest_api.app.execution_arn}/*/*"
+output "api_friendly_url" {
+  value = module.lambda_function.friendly_invoke_url
 }

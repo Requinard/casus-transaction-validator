@@ -7,6 +7,8 @@ module "cdn" {
   parent_zone_name     = var.dns_zone
   website_enabled      = true
   origin_force_destroy = true
+  logging_enabled      = false
+
   aliases              = [
     local.app_domain_full
   ]
