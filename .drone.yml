@@ -51,7 +51,7 @@ steps:
         from_secret: aws_secret
     commands:
       - cd terraform
-      - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
+        - terraform workspace select ${DRONE_COMMIT_BRANCH} || terraform workspace new ${DRONE_COMMIT_BRANCH}
     depends_on:
       - terraform init
 

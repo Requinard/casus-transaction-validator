@@ -1,7 +1,7 @@
 module "cdn" {
   source               = "git::https://github.com/cloudposse/terraform-aws-cloudfront-s3-cdn.git?ref=tags/0.35.0"
   dns_alias_enabled    = true
-  namespace            = "luminis"
+  namespace            = "casus-transactions"
   stage                = local.stage
   name                 = "frontend"
   parent_zone_name     = var.dns_zone

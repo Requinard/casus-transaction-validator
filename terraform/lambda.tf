@@ -6,7 +6,7 @@ module "lambda_function" {
   dns_zone_id         = data.aws_route53_zone.base_zone.id
 
   lambda_handler = "lambda.handler"
-  lambda_name    = "luminis-transaction-validator-${local.stage}"
+  lambda_name    = "casus-transaction-validator-${local.stage}"
   lambda_runtime = "python3.8"
   lambda_zip     = "../app.zip"
 }
