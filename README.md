@@ -1,4 +1,4 @@
-# Luminis Rotterdam Case
+# Transaction validator case
 
 Check `docs` for more info
 
